@@ -1,0 +1,11 @@
+# plotly出力
+plotly_out/
+
+# 音声ファイル
+sound_data/
+
+# STT結果
+stt_results/
+
+# api_key
+api_key.json
