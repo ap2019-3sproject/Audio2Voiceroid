@@ -43,9 +43,9 @@ class IBM_STT:
             self.key = df['apikey']
             self.url = df['url']
 
-    def stt(self):
+    def stt(self, target_dir='stt_results/'):
         print('\n--- START STT ---\n')
-        result_filename = 'stt_results/' + self.filename + '.json'
+        result_filename = target_dir + self.filename + '.json'
         if os.path.exists(result_filename):
             print('ファイルあったのん！')
             with open(result_filename) as f:

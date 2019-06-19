@@ -4,6 +4,9 @@ plotly_out/
 # 音声ファイル
 sound_data/
 
+# 動画ファイル
+video_data/
+
 # STT結果
 stt_results/
 

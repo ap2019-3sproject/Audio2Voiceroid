@@ -3,6 +3,7 @@ import IBM_STT
 import socket
 import json
 import time
+import subprocess
 
 
 class MessageSender:
@@ -42,7 +43,7 @@ def callback_fn(texts):
         body = json.dumps(data, ensure_ascii=False)
         print(text)
         send_message(body)
-        time.sleep(0.5)
+        time.sleep(1)
     message_sender.disconnect()
     print('--- END SEND ---')
 
