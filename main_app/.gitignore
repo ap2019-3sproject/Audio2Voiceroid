@@ -3,6 +3,7 @@ plotly_out/
 
 # 音声ファイル
 sound_data/
+voiceroid_out/
 
 # 動画ファイル
 video_data/

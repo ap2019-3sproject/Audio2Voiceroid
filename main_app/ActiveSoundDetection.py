@@ -142,6 +142,8 @@ def init():
         ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.mp3', callback_fn)
         ibm_stt.stt(target_dir='stt_results/movie1/')
 
+    np.savetxt(target_dir + 'sections.csv', asd.split_sound['sections'], delimiter=',')
+
 
 if __name__ == '__main__':
     init()

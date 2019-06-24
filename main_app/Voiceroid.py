@@ -6,12 +6,11 @@ class Voiceroid:
         self.id = id
         self.seika_path = seika_path
 
-    def talk(self, params, text):
-        command = [self.seika_path, '-cid', self.id]
+    def talk(self, params):
+        command = [self.seika_path, '-cid', str(self.id)]
         for key, val in params.items():
             command.append('-' + key)
             command.append(val)
-        command.append('\"' + text + '\"')
 
         subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
@@ -23,9 +22,10 @@ def test():
         'speed': '1.0',
         'pitch': '0.8',
         'intonation': '0.8',
-        'save': '絶対パス'
+        'save': '絶対パス',
+        't': '喋るテキスト'
     }
-    voiceroid.talk(params, 'テキスト')
+    voiceroid.talk(params)
 
 
 if __name__ == '__main__':
