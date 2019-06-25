@@ -15,7 +15,7 @@ class VideoConverter:
         print(self.ffmpeg_dir)
 
     # 音声ファイル抽出
-    def convert_to_audio(self, ext='mp3', target_dir='sound_data/'):
+    def convert_to_audio(self, ext='wav', target_dir='sound_data/'):
         save_file = target_dir + self.filename + '.' + ext
         command = [self.ffmpeg_dir, '-y', '-i', self.filepath, save_file]
         subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

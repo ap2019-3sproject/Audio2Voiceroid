@@ -86,7 +86,9 @@ class ActiveSoundDetection:
         np_off = np.where(flg == -1)[0] + 1
         if len(np_on) > len(np_off):  # 終了時点まで有声区間だった時
             np_off = np.append(np_off, len(flg))
-        sections = np.stack([np_on, np_off], axis=1) * split_len
+        # sections = np.stack([np_on, np_off], axis=1) * split_len
+        sections = np.stack([np_on, np_off], axis=1) * self.window
+        sections_sec = sections / self.rate
         # print(sections)
 
         chunks = []
@@ -96,6 +98,7 @@ class ActiveSoundDetection:
 
         self.split_sound['chunks'] = chunks
         self.split_sound['sections'] = sections
+        self.split_sound['sections_sec'] = sections_sec
 
     def save_splits(self, target_dir, clear_dir=True):
         if clear_dir:
@@ -104,7 +107,10 @@ class ActiveSoundDetection:
 
         chunks = self.split_sound['chunks']
         for i, chunk in enumerate(chunks):
-            chunk.export(target_dir + str(i) + '.mp3', format='mp3')
+            chunk.export(target_dir + str(i) + '.wav', format='wav')
+
+        np.savetxt(target_dir + 'sections.csv', self.split_sound['sections'], delimiter=',')
+        np.savetxt(target_dir + 'sections_sec.csv', self.split_sound['sections_sec'], delimiter=',')
 
     def plot_raw_sound(self):
         x = np.arange(self.data.size) / self.window
@@ -131,7 +137,7 @@ def callback_fn(texts):
 def init():
     # 音声ファイルの読み込み
     # sound = AudioSegment.from_file("reproduction-smp-edited.wav", "wav")
-    sound = AudioSegment.from_mp3('sound_data/movie1.mp3')
+    sound = AudioSegment.from_wav('sound_data/movie1.wav')
 
     asd = ActiveSoundDetection(sound)
     asd.split_on_silence_orig(split_len=1500, silence_thresh=1000)
@@ -139,7 +145,7 @@ def init():
     asd.save_splits(target_dir, clear_dir=True)
 
     for i in range(len(asd.split_sound['chunks'])):
-        ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.mp3', callback_fn)
+        ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.wav', callback_fn)
         ibm_stt.stt(target_dir='stt_results/movie1/')
 
     np.savetxt(target_dir + 'sections.csv', asd.split_sound['sections'], delimiter=',')

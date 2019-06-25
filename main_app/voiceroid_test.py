@@ -31,6 +31,22 @@ def concat(target_dir, ext, num, silence):
     print(proc.stdout)
 
 
+def get_silences():
+    sections_sec = np.loadtxt('sound_data/temp/sections_sec.csv', delimiter=',')
+    silences = []
+    if sections_sec[0, 0] > 0:
+        silences.append(sections_sec[0, 0])
+    global _size
+    for i in range(_size):
+        sound = AudioSegment.from_wav('voiceroid_out/temp/' + str(i) + '.wav')
+        add_time = sections_sec[i, 1] - sections_sec[i, 0] - sound.duration_seconds
+        if i < _size-1:
+            add_time += sections_sec[i+1, 0] - sections_sec[i, 1]
+        add_time = add_time if add_time > 0 else 0
+        silences.append(add_time)
+    return silences
+
+
 def callback_fn(texts):
     global _voiceroid
     global _cnt
@@ -41,9 +57,9 @@ def callback_fn(texts):
         params = {
             'volume': '1.3',
             'speed': '1.0',
-            'pitch': '0.8',
-            'intonation': '0.8',
-            'save': '絶対パス/voiceroid_out/temp/' + str(_cnt) + '_' + str(i) + '.wav',
+            'pitch': '1.0',
+            'intonation': '1.0',
+            'save': 'C:/Users/sys1member/Documents/2019proen/shimomura/main_app/voiceroid_out/temp/' + str(_cnt) + '_' + str(i) + '.wav',
             't': text
         }
         _voiceroid.talk(params)
@@ -56,29 +72,29 @@ def callback_fn(texts):
 
     global _size
     if _cnt == _size:
-        silences = [1] * text_num
+        # silences = [1] * text_num
+        silences = get_silences()
         concat('voiceroid_out/temp/', 'wav', text_num, silences)
 
 
 def init():
-    
     shutil.rmtree('voiceroid_out/temp/')
     os.mkdir('voiceroid_out/temp/')
+    os.chmod('voiceroid_out/temp/',0o777)
 
     # 音声ファイルの読み込み
     # sound = AudioSegment.from_file("reproduction-smp-edited.wav", "wav")
-    sound = AudioSegment.from_mp3('sound_data/movie1.mp3')
+    sound = AudioSegment.from_wav('sound_data/movie1.wav')
 
     asd = ActiveSoundDetection.ActiveSoundDetection(sound)
     asd.split_on_silence_orig(split_len=1500, silence_thresh=1000)
     target_dir = 'sound_data/temp/'
     asd.save_splits(target_dir, clear_dir=True)
 
-    np.savetxt(target_dir + 'sections.csv', asd.split_sound['sections'], delimiter=',')
     global _size
     _size = len(asd.split_sound['chunks'])
     for i in range(_size):
-        ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.mp3', callback_fn)
+        ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.wav', callback_fn)
         ibm_stt.stt(target_dir='stt_results/movie1/')
 
 

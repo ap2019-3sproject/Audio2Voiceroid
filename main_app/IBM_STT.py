@@ -48,7 +48,7 @@ class IBM_STT:
         result_filename = target_dir + self.filename + '.json'
         if os.path.exists(result_filename):
             print('ファイルあったのん！')
-            with open(result_filename) as f:
+            with open(result_filename, encoding="utf-8") as f:
                 df = json.load(f)
                 self.set_result(df)
         else:
