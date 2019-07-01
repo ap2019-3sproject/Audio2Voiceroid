@@ -83,3 +83,13 @@ class IBM_STT:
         self.get_result_texts()
         for text in self.result_texts:
             print(text)
+
+
+def init():
+    lambda_fn = lambda: print('done')
+    ibm_stt = IBM_STT('sound_data/manner_lecture.wav', lambda_fn)
+    ibm_stt.stt(target_dir='stt_results/sample/')
+
+
+if __name__ == '__main__':
+    init()

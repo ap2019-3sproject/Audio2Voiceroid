@@ -63,7 +63,7 @@ class ActiveSoundDetection:
         self.split_sound = {}
         self.window = 1
 
-    def split_on_silence_orig(self, split_len=1000, silence_thresh=1000):
+    def split_on_silence_orig(self, split_len=1000, silence_thresh=1000, length_thresh=1):
         # 前処理
         time = int(self.time)
         self.data = self.data[:self.rate * time]
@@ -87,12 +87,15 @@ class ActiveSoundDetection:
         if len(np_on) > len(np_off):  # 終了時点まで有声区間だった時
             np_off = np.append(np_off, len(flg))
         # sections = np.stack([np_on, np_off], axis=1) * split_len
-        sections = np.stack([np_on, np_off], axis=1) * self.window
+        sections = np.stack([np_on, np_off], axis=1)
+        sections = sections[sections[:, 1] - sections[:, 0] >= length_thresh, :] * self.window
         sections_sec = sections / self.rate
         # print(sections)
+        print(sections_sec)
 
         chunks = []
-        for section in sections:
+        for section in sections_sec:
+            section = section * 1000
             chunks.append(self.sound[section[0]: section[1]])
         print('split: ', len(chunks), ' chunk')
 
@@ -137,16 +140,16 @@ def callback_fn(texts):
 def init():
     # 音声ファイルの読み込み
     # sound = AudioSegment.from_file("reproduction-smp-edited.wav", "wav")
-    sound = AudioSegment.from_wav('sound_data/movie1.wav')
+    sound = AudioSegment.from_wav('sound_data/manner_lecture.wav')
 
     asd = ActiveSoundDetection(sound)
-    asd.split_on_silence_orig(split_len=1500, silence_thresh=1000)
+    asd.split_on_silence_orig(split_len=500, silence_thresh=1000, length_thresh=10)
     target_dir = 'sound_data/temp/'
     asd.save_splits(target_dir, clear_dir=True)
 
     for i in range(len(asd.split_sound['chunks'])):
         ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.wav', callback_fn)
-        ibm_stt.stt(target_dir='stt_results/movie1/')
+        ibm_stt.stt(target_dir='stt_results/manner_lecture/')
 
     np.savetxt(target_dir + 'sections.csv', asd.split_sound['sections'], delimiter=',')
 

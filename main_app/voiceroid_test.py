@@ -82,9 +82,10 @@ def init():
     os.mkdir('voiceroid_out/temp/')
     os.chmod('voiceroid_out/temp/',0o777)
 
+    target_name = 'movie1'
     # 音声ファイルの読み込み
     # sound = AudioSegment.from_file("reproduction-smp-edited.wav", "wav")
-    sound = AudioSegment.from_wav('sound_data/movie1.wav')
+    sound = AudioSegment.from_wav('sound_data/' + target_name + '.wav')
 
     asd = ActiveSoundDetection.ActiveSoundDetection(sound)
     asd.split_on_silence_orig(split_len=1500, silence_thresh=1000)
@@ -95,7 +96,7 @@ def init():
     _size = len(asd.split_sound['chunks'])
     for i in range(_size):
         ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.wav', callback_fn)
-        ibm_stt.stt(target_dir='stt_results/movie1/')
+        ibm_stt.stt(target_dir='stt_results/' + target_name + '/')
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ class VideoConverter:
 
 
 def init():
-    converter = VideoConverter('動画までの絶対パス')
+    converter = VideoConverter('/Users/shimomuramitsuhiko/Documents/UT/3S/puroen/main_app/video_data/sample.mp4')
     audio_file = converter.convert_to_audio()
     print(audio_file)
     # video_file = converter.convert_to_silence_video()
