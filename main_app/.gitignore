@@ -2,14 +2,15 @@
 plotly_out/
 
 # 音声ファイル
-sound_data/
-voiceroid_out/
+sound_data/*
+voiceroid_out/*
 
 # 動画ファイル
-video_data/
+video_data/*
 
 # STT結果
-stt_results/
+stt_results/*
+!.gitkeep
 
 # api_key
 api_key.json
