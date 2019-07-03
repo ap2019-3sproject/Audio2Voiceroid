@@ -7,12 +7,13 @@ import os
 import shutil
 import numpy as np
 import subprocess
+import time
 
 
 def concat(target_dir, ext, num, silence):
     command = ['ffmpeg']
     command.append('-y')
-    for i in range(num):
+    for i in range(1, num+1):
         command.append('-f')
         command.append('lavfi')
         command.append('-i')
@@ -25,8 +26,10 @@ def concat(target_dir, ext, num, silence):
         option += '[{}:0][{}:0]'.format(i*2, i*2+1)
     option += 'concat=n={}:v=0:a=1'.format(2*num)
     command.append(option)
-    command.append('out.mp3')
+    command.append('out.wav')
     print(command)
+    for cmd in command:
+        print(cmd)
     proc = subprocess.run(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, cwd=target_dir)
     print(proc.stdout)
 
@@ -38,7 +41,7 @@ def get_silences():
         silences.append(sections_sec[0, 0])
     global _size
     for i in range(_size):
-        sound = AudioSegment.from_wav('voiceroid_out/temp/' + str(i) + '.wav')
+        sound = AudioSegment.from_wav('voiceroid_out/temp/' + str(i+1) + '.wav')
         add_time = sections_sec[i, 1] - sections_sec[i, 0] - sound.duration_seconds
         if i < _size-1:
             add_time += sections_sec[i+1, 0] - sections_sec[i, 1]
@@ -56,10 +59,10 @@ def callback_fn(texts):
         text = texts[i]
         params = {
             'volume': '1.3',
-            'speed': '1.0',
+            'speed': '1.3',
             'pitch': '1.0',
             'intonation': '1.0',
-            'save': 'C:/Users/sys1member/Documents/2019proen/shimomura/main_app/voiceroid_out/temp/' + str(_cnt) + '_' + str(i) + '.wav',
+            'save': 'C:/Users/sys1member/Documents/2019proen/shimomura/ProjectExercise/main_app/voiceroid_out/temp/' + str(_cnt) + '_' + str(i) + '.wav',
             't': text
         }
         _voiceroid.talk(params)
@@ -71,10 +74,12 @@ def callback_fn(texts):
     combined.export('voiceroid_out/temp/' + str(_cnt) + '.wav', format='wav')
 
     global _size
+    print(_cnt, _size)
     if _cnt == _size:
         # silences = [1] * text_num
+        print('concat')
         silences = get_silences()
-        concat('voiceroid_out/temp/', 'wav', text_num, silences)
+        concat('voiceroid_out/temp/', 'wav', _size, silences)
 
 
 def init():
@@ -82,13 +87,13 @@ def init():
     os.mkdir('voiceroid_out/temp/')
     os.chmod('voiceroid_out/temp/',0o777)
 
-    target_name = 'movie1'
+    target_name = 'manner_lecture_edit'
     # 音声ファイルの読み込み
     # sound = AudioSegment.from_file("reproduction-smp-edited.wav", "wav")
     sound = AudioSegment.from_wav('sound_data/' + target_name + '.wav')
 
     asd = ActiveSoundDetection.ActiveSoundDetection(sound)
-    asd.split_on_silence_orig(split_len=1500, silence_thresh=1000)
+    asd.split_on_silence_orig(split_len=500, silence_thresh=1000, length_thresh=10)
     target_dir = 'sound_data/temp/'
     asd.save_splits(target_dir, clear_dir=True)
 
@@ -97,6 +102,7 @@ def init():
     for i in range(_size):
         ibm_stt = IBM_STT.IBM_STT(target_dir + str(i) + '.wav', callback_fn)
         ibm_stt.stt(target_dir='stt_results/' + target_name + '/')
+
 
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ class IBM_STT:
             self.on_data_fn = on_data_fn
 
         def on_data(self, data):
+            print('MyRecognizeCallback', data)
             print(json.dumps(data, indent=2))
             self.on_data_fn(data)
 
@@ -48,7 +49,7 @@ class IBM_STT:
         result_filename = target_dir + self.filename + '.json'
         if os.path.exists(result_filename):
             print('ファイルあったのん！')
-            with open(result_filename, encoding="utf-8") as f:
+            with open(result_filename, encoding="shift_jis") as f:
                 df = json.load(f)
                 self.set_result(df)
         else:
@@ -62,6 +63,7 @@ class IBM_STT:
                     max_alternatives=1)
 
     def save_result(self, data):
+        print('save_result', data)
         result_filename = 'stt_results/' + self.filename + '.json'
         with open(result_filename, 'w') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
