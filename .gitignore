@@ -4,4 +4,7 @@ _ipynb_checkpoints/
 # 下書きプログラム
 ibm/
 
+# アーカイブ
+archives/
+
 *.mp4
